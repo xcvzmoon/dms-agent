@@ -5,3 +5,7 @@ export class TauriStoreError extends TaggedError('TauriStoreError')<{
   message: string;
   error: unknown;
 }> {}
+
+export class UploadError extends TaggedError('UploadError')<{
+  message: string;
+}> {}

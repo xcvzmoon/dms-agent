@@ -31,3 +31,33 @@ pub struct WatchLogEntry {
     pub created_at: u64,
     pub action: WatchAction,
 }
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct UploadItem {
+    pub id: String,
+    pub file: String,
+    pub directory_path: String,
+    pub dms_endpoint: Option<String>,
+    pub file_type: Option<String>,
+    pub file_name: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SyncLogEntry {
+    pub id: String,
+    pub directory_path: String,
+    pub file: String,
+    pub file_name: String,
+    pub dms_endpoint: String,
+    pub document_ids: Vec<u64>,
+    pub created_at: u64,
+}
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct UploadOutcome {
+    pub dms_endpoint: String,
+    pub document_ids: Vec<u64>,
+}
