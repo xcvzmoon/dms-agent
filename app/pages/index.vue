@@ -1,5 +1,5 @@
 <template>
-  <div class="grid h-full place-items-center">
+  <AppPageContainer class="grid place-items-center">
     <p>Hello World!</p>
-  </div>
+  </AppPageContainer>
 </template>
