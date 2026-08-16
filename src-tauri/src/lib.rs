@@ -1,4 +1,14 @@
-use tauri::Manager;
+mod commands;
+mod models;
+mod state;
+mod store;
+mod tray;
+mod util;
+
+use tauri::{Manager, WindowEvent};
+
+use commands::{start_watchers, stop_watchers};
+use state::AppState;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -16,6 +26,9 @@ pub fn run() {
     builder
         .plugin(tauri_plugin_store::Builder::new().build())
         .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_notification::init())
+        .manage(AppState::default())
+        .invoke_handler(tauri::generate_handler![start_watchers, stop_watchers])
         .setup(|app| {
             if cfg!(debug_assertions) {
                 app.handle().plugin(
@@ -23,6 +36,19 @@ pub fn run() {
                         .level(log::LevelFilter::Info)
                         .build(),
                 )?;
+            }
+
+            tray::build_tray(app.handle())?;
+
+            if let Some(window) = app.get_webview_window("main") {
+                let closing_window = window.clone();
+
+                window.on_window_event(move |event| {
+                    if let WindowEvent::CloseRequested { api, .. } = event {
+                        api.prevent_close();
+                        let _ = closing_window.hide();
+                    }
+                });
             }
 
             Ok(())

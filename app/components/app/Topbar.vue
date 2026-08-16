@@ -1,8 +1,8 @@
 <script setup lang="ts">
+  const version = await useTauriAppGetVersion();
   const colorMode = useColorMode();
   const { isSidebarCollapsed, toggleSidebar } = useLayoutStore();
-
-  const version = await useTauriAppGetVersion();
+  const { isRunning, run, stop } = useWatchersStore();
 
   const isDark = computed({
     get: () => colorMode.value === 'dark',
@@ -26,11 +26,21 @@
     </div>
 
     <UButton
-      :icon="isSidebarCollapsed ? 'i-lucide-panel-left-open' : 'i-lucide-panel-left-close'"
+      :icon="isRunning ? 'i-lucide-square' : 'i-lucide-play'"
+      :label="isRunning ? 'Stop Watchers' : 'Run Watchers'"
       size="sm"
       color="neutral"
       variant="ghost"
       class="ml-auto p-1"
+      @click="isRunning ? stop() : run()"
+    />
+
+    <UButton
+      :icon="isSidebarCollapsed ? 'i-lucide-panel-left-open' : 'i-lucide-panel-left-close'"
+      size="sm"
+      color="neutral"
+      variant="ghost"
+      class="p-1 text-xs"
       @click="toggleSidebar"
     />
 
