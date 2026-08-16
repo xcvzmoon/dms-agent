@@ -37,10 +37,13 @@
   "dependencies": {
     "@nuxt/ui": "4.10.0",
     "@tauri-apps/api": "^2.11.1",
+    "@tauri-apps/plugin-dialog": "^2.7.2",
     "@tauri-apps/plugin-store": "~2.4.4",
     "@vueuse/nuxt": "14.4.0",
+    "@vueuse/router": "^14.4.0",
     "better-result": "^3.0.1",
     "nuxt": "^4.5.2",
+    "reka-ui": "^2.10.3",
     "tailwindcss": "^4.3.3",
     "valibot": "^1.4.2",
     "vue": "^3.5.41",
