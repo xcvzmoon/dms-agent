@@ -1,4 +1,5 @@
 mod commands;
+mod config;
 mod models;
 mod state;
 mod store;
@@ -7,7 +8,7 @@ mod util;
 
 use tauri::{Manager, WindowEvent};
 
-use commands::{start_watchers, stop_watchers};
+use commands::{start_watchers, stop_watchers, upload_document};
 use state::AppState;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -28,7 +29,11 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_notification::init())
         .manage(AppState::default())
-        .invoke_handler(tauri::generate_handler![start_watchers, stop_watchers])
+        .invoke_handler(tauri::generate_handler![
+            start_watchers,
+            stop_watchers,
+            upload_document
+        ])
         .setup(|app| {
             if cfg!(debug_assertions) {
                 app.handle().plugin(

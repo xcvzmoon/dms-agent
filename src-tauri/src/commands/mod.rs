@@ -1,4 +1,7 @@
+pub mod upload;
 pub mod watch;
+
+pub use upload::upload_document;
 
 use tauri::AppHandle;
 
