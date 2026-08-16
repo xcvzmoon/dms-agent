@@ -1,0 +1,15 @@
+name: Setup project
+description: Set up Vite+ (Node.js and pnpm, cached) and install dependencies. Assumes the repo has already been checked out.
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Vite+
+      uses: voidzero-dev/setup-vp@v1
+      with:
+        node-version: '24'
+        cache: true
+
+    - name: Install dependencies
+      shell: bash
+      run: vp install

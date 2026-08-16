@@ -1,0 +1,117 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  create-release:
+    name: Create Draft Release
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Create or Reuse Draft Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          if gh release view "$TAG" --json tagName >/dev/null 2>&1; then
+            echo "Release $TAG already exists, reusing it."
+            exit 0
+          fi
+
+          gh release create "$TAG" \
+            --title "DMS Agent $TAG" \
+            --draft \
+            --generate-notes
+
+  release:
+    name: Release (${{ matrix.target }})
+    needs: [create-release]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: macos-latest
+            target: aarch64-apple-darwin
+            args: --target aarch64-apple-darwin --bundles dmg
+          - platform: macos-latest
+            target: x86_64-apple-darwin
+            args: --target x86_64-apple-darwin --bundles dmg
+          - platform: windows-2025
+            target: x86_64-pc-windows-msvc
+            args: --target x86_64-pc-windows-msvc --bundles nsis
+          # - platform: ubuntu-24.04
+          #   target: x86_64-unknown-linux-gnu
+          #   args: --target x86_64-unknown-linux-gnu --bundles deb
+
+    runs-on: ${{ matrix.platform }}
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Install Linux Tauri dependencies
+        if: contains(matrix.platform, 'ubuntu')
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            libssl-dev \
+            build-essential \
+            patchelf
+
+      - name: Setup project
+        uses: ./.github/actions/setup-project
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Cache Rust
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+          key: ${{ matrix.target }}
+
+      - name: Build Tauri app
+        run: vpx tauri build ${{ matrix.args }}
+
+      - name: Upload release assets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          bundle_dir="src-tauri/target/${{ matrix.target }}/release/bundle"
+          assets=()
+          while IFS= read -r file; do
+            assets+=("$file")
+          done < <(find "$bundle_dir" -maxdepth 2 -type f \( -name '*.dmg' -o -name '*.exe' -o -name '*.deb' \))
+
+          if [ "${#assets[@]}" -eq 0 ]; then
+            echo "No bundle assets found under $bundle_dir" >&2
+            exit 1
+          fi
+
+          for attempt in 1 2 3; do
+            if gh release upload "${{ github.ref_name }}" "${assets[@]}" --clobber; then
+              exit 0
+            fi
+            echo "Upload attempt $attempt failed, retrying in 5s..." >&2
+            sleep 5
+          done
+
+          exit 1

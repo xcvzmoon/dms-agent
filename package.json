@@ -1,0 +1,69 @@
+{
+  "name": "dms-agent",
+  "description": "DMS Agent",
+  "version": "0.0.0",
+  "type": "module",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "build": "tauri build",
+    "bundle": "tauri bundle",
+    "postinstall": "vpr nuxt:postinstall",
+    "dev": "node scripts/dev.ts",
+    "release": "node scripts/release.ts",
+    "fmt": "vpr vp:fmt && vpr cargo:fmt",
+    "fmt:check": "vpr vp:fmt:check && vpr cargo:fmt:check",
+    "lint": "vpr vp:lint && vpr cargo:lint",
+    "test": "vpr vp:test && vpr cargo:test",
+    "clean": "vpr nuxt:cleanup && vpr cargo:clean",
+    "vp:fmt": "vp fmt",
+    "vp:fmt:check": "vp fmt --check",
+    "vp:lint": "vp lint",
+    "vp:test": "vp test --reporter verbose",
+    "cargo:fmt": "cargo fmt --manifest-path src-tauri/Cargo.toml",
+    "cargo:fmt:check": "cargo fmt --manifest-path src-tauri/Cargo.toml -- --check",
+    "cargo:lint": "cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings",
+    "cargo:test": "cargo test --manifest-path src-tauri/Cargo.toml",
+    "cargo:clean": "cargo clean --manifest-path src-tauri/Cargo.toml",
+    "cargo:clean:release": "cargo clean --release --manifest-path src-tauri/Cargo.toml",
+    "nuxt:build": "nuxt build",
+    "nuxt:dev": "nuxt dev",
+    "nuxt:generate": "nuxt generate",
+    "nuxt:preview": "nuxt preview",
+    "nuxt:postinstall": "nuxt prepare",
+    "nuxt:typecheck": "nuxt typecheck",
+    "nuxt:cleanup": "nuxt cleanup"
+  },
+  "dependencies": {
+    "@nuxt/ui": "4.10.0",
+    "@tauri-apps/api": "^2.11.1",
+    "@tauri-apps/plugin-store": "~2.4.4",
+    "@vueuse/nuxt": "14.4.0",
+    "better-result": "^3.0.1",
+    "nuxt": "^4.5.2",
+    "tailwindcss": "^4.3.3",
+    "valibot": "^1.4.2",
+    "vue": "^3.5.41",
+    "vue-router": "^5.2.0"
+  },
+  "devDependencies": {
+    "@golar/vue": "^0.1.10",
+    "@tauri-apps/cli": "^2.11.4",
+    "@types/node": "^26.2.0",
+    "bumpp": "^12.2.1",
+    "changelogen": "^0.6.2",
+    "consola": "^3.4.2",
+    "golar": "^0.1.10",
+    "typescript": "6.0.3",
+    "vite": "npm:@voidzero-dev/vite-plus-core@0.2.9",
+    "vite-plus": "catalog:",
+    "vue-tsc": "^3.3.10"
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "11.21.0",
+      "onFail": "download"
+    }
+  }
+}
